@@ -4,7 +4,8 @@ const User = require("./models/User");
 const Listing = require("./models/Listing");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
-
+const cors = require("cors");
+const auth = require("./auth");
 const mongoose = require("mongoose");
 require("dotenv/config");
 mongoose.connect(process.env.DB_CONNECTION);
@@ -14,28 +15,8 @@ db.on("error", (error) => console.log(error));
 db.once("open", () => console.log("connected"));
 
 app.use(express.json());
-
-app.use("/addListing", (req, res, next) => {
-  try {
-    let token = req.header("Authorization");
-
-    if (!token) {
-      return res.status(403).send("Access Denied");
-    }
-
-    if (token.startsWith("Bearer ")) {
-      token = token.slice(7, token.length).trimStart();
-    }
-
-    const verified = jwt.verify(token, process.env.JWT_SECRET);
-    req.user = verified;
-    next();
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
-
-app.post("/addListing", async (req, res) => {
+app.use(cors());
+app.post("/addListing", auth, async (req, res) => {
   const { userId, address, area, type, price, isVIP, kode, views } = req.body;
   const listing = new Listing({
     userId,
