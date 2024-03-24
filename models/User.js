@@ -9,18 +9,11 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  buisnestype: {
-    type: String,
-    required: true,
-  },
+
   contactnumber: {
     type: String,
     unique: true,
     index: true,
-    required: true,
-  },
-  birthdate: {
-    type: String,
     required: true,
   },
   email: {
@@ -29,12 +22,7 @@ const userSchema = new mongoose.Schema({
     index: true,
     required: true,
   },
-  username: {
-    type: String,
-    unique: true,
-    index: true,
-    required: true,
-  },
+
   password: {
     type: String,
     required: true,
