@@ -23,7 +23,48 @@ db.once("open", () => console.log("connected"));
 
 app.use(express.json());
 app.use(cors());
+app.get("/image/:id", async (req, res) => {
+  console.log(req.params.id);
+  try {
+    const image = await ListingImage.findById(req.params.id);
+    console.log(image.path);
+    res.sendFile(image.path);
+  } catch (err) {
+    res.status(400).json({ message: err.message });
+  }
+});
+app.get("/getListing", async (req, res) => {
+  const id = req.body.id;
+  try {
+    const listing = await Listing.findById(id);
+    const images = await ListingImage.find({ listingId: id });
+    res.status(200).json({ listing, images });
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ message: err.message });
+  }
+});
+app.get("/getListings" /*/:page*/, async (req, res) => {
+  try {
+    //const page = parseInt(req.params.page);
+    const listings = await Listing.find({}).limit(20);
+    //.skip(page * 10);
+    const list = await Promise.all(
+      listings.map(async (listing) => {
+        const images = await ListingImage.find({
+          listingId: listing._id.toString(),
+        });
+        return { listing, images };
+      })
+    );
+    console.log(list);
 
+    res.status(200).json({ list });
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ message: err.message });
+  }
+});
 app.post(
   "/upload",
   fileUpload({ createParentPath: true }),
@@ -71,7 +112,7 @@ app.post(
 
     return res.json({
       status: "success",
-      message: Object.keys(files).toString(),
+      message: Object.keys(files).toString() + listingId,
     });
   }
 );
