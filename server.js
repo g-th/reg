@@ -30,11 +30,11 @@ app.get("/image/:id", async (req, res) => {
     console.log(image.path);
     res.sendFile(image.path);
   } catch (err) {
-    res.status(400).json({ message: err.message });
+    res.status(500).json({ message: err.message });
   }
 });
-app.get("/getListing", async (req, res) => {
-  const id = req.body.id;
+app.get("/getListing/:id", async (req, res) => {
+  const id = req.params.id;
   try {
     const listing = await Listing.findById(id);
     const images = await ListingImage.find({ listingId: id });
