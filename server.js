@@ -71,8 +71,16 @@ app.get("/getUser/:id", async (req, res) => {
   const id = req.params.id;
   try {
     const user = await User.findById(id);
-    delete user.password;
-    res.status(200).json(user);
+    let us={
+      _id:user.id,
+      firstname:user.firstname,
+      lastname:user.lastname,
+      contactnumber:user.contactnumber,
+      email:user.email
+
+    }
+    
+    res.status(200).json(us);
   } catch (err) {
     console.log(err);
     res.status(500).json({ message: err.message });
