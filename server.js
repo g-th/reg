@@ -66,6 +66,7 @@ app.get("/getListings" /*/:page*/, async (req, res) => {
   }
 });
 //get user listingis amtvirtavi
+//passwords abrunebs washale
 app.get("/getUser/:id", async (req, res) => {
   const id = req.params.id;
   try {
@@ -78,6 +79,8 @@ app.get("/getUser/:id", async (req, res) => {
   }
 });
 // useris gancxadebebi
+
+//suratebic gamoushvas
 app.get("/listingsByUser/:id", async (req, res) => {
   const id = req.params.id;
   try {
@@ -203,3 +206,4 @@ app.listen(3000, () => {
   console.log("server started");
 });
 //fartis tipi  kvebis obieqti, sawyobi, saofise, yvela bazashi da lidting idebi 
+//

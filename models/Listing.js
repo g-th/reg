@@ -71,7 +71,7 @@ const listingSchema = new mongoose.Schema({
     required: false,
   },
   internet: {
-    type: boolean,
+    type: Boolean,
     required: false,
   },
   curentCondition: {
