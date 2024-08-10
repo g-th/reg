@@ -71,7 +71,7 @@ app.get("/getUser/:id", async (req, res) => {
   const id = req.params.id;
   try {
     const user = await User.findById(id);
-    
+    delete user.password;
     res.status(200).json(user);
   } catch (err) {
     console.log(err);
@@ -119,7 +119,7 @@ app.post(
     const files = req.files;
     console.log(files);
 
-    const { userId, address, area, type, price, kode } = req.body;
+    const { userId, sity,region,address, coordinates, area, type, price, kode,description ,electrisity,water,naturalGas,floor,bathroom,internet,curentCondition} = req.body;
     const listing = new Listing({
       userId: userId,
       address: address,
@@ -127,6 +127,20 @@ app.post(
       type: type,
       price: price,
       kode: kode,
+      sity: sity,
+      region: region,
+      coordinates:coordinates,
+      description:description,
+      electrisity:electrisity,
+      water:water,
+      naturalGas:naturalGas,
+      floor:floor,
+      bathroom:bathroom,
+      internet:internet,
+      curentCondition:curentCondition
+      
+
+
     });
     let listingId = "";
     try {
