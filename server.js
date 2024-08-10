@@ -93,8 +93,20 @@ app.get("/listingsByUser/:id", async (req, res) => {
   const id = req.params.id;
   try {
     const listings = await Listing.find({userId:id});
-  
-    res.status(200).json({ listings});
+    const list = await Promise.all(
+      listings.map(async (listing) => {
+        const images = await ListingImage.find({
+          listingId: listing._id.toString(),
+        });
+        let imageIds=[]
+        images.forEach((e)=>{
+          imageIds.push(e.id)
+        })
+        return { listing, imageIds};
+      })
+    );
+    console.log(list);
+    res.status(200).json(list);
   } catch (err) {
     console.log(err);
     res.status(500).json({ message: err.message });
