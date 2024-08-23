@@ -3,6 +3,7 @@ const app = express();
 const User = require("./models/User");
 const Listing = require("./models/Listing");
 const ListingImage = require("./models/ListingImage");
+const SavedItem=require("./models/SavedItem");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const cors = require("cors");
@@ -44,6 +45,31 @@ app.get("/getListing/:id", async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 });
+app.put("/listing", async (req, res) => {
+  try{
+  const { listing} = req.body;
+  const updatedListing=await Listing.findOneAndUpdate({_id : listing._id}, listing,  {
+    new: true
+  });
+  res.status(200).json(updatedListing);
+}catch(err) {
+  console.log(err);
+  res.status(500).json({ message: err.message });
+}
+  
+})
+app.delete("/listing/:id", async (req, res) => {
+  try{
+    const id = req.params.id;
+  const ans=await Listing.deleteOne({_id:id})
+  const a=await ListingImage.deleteMany({listingId:id})
+  res.status(200).json(ans,a);
+}catch(err) {
+  console.log(err);
+  res.status(500).json({ message: err.message });
+}
+  
+})
 app.get("/getListings" /*/:page*/, async (req, res) => {
   try {
     //const page = parseInt(req.params.page);
@@ -112,7 +138,7 @@ app.get("/listingsByUser/:id", async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 });
-//naxvebis mtvleli
+
 app.get("/views/:id", async (req, res) => {
   const id = req.params.id;
   try {
@@ -129,6 +155,39 @@ app.get("/views/:id", async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 });
+
+
+app.post("/savedItem", async (req, res) => {
+  try {
+    const{userId,listingId}=req.body;
+    const savedItem=new SavedItem({
+      userId,
+      listingId
+    })
+    const item=await savedItem.save();
+    res.status(200).json({ item });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+})
+app.get("/savedItems/:id", async (req, res) => {
+  try {
+    const id = req.params.id;
+    const savedItems=await SavedItem.find({userId:id})
+    res.status(200).json({savedItems});
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+})
+app.delete("/savedItem", async (req, res) => {
+  try {
+    const{userId,listingId}=req.body;
+    const item=await SavedItem.delete({userId:userId,listingId:listingId})
+    res.status(200).json({ item});
+  } catch (err) {  
+    res.status(500).json({ error: err.message });
+  }
+})
 app.post(
   "/upload",
   fileUpload({ createParentPath: true }),
@@ -239,5 +298,14 @@ app.post("/register", async (req, res) => {
 app.listen(3000, () => {
   console.log("server started");
 });
-//fartis tipi  kvebis obieqti, sawyobi, saofise, yvela bazashi da lidting idebi 
-//
+//fartis tipi  kvebis obieqti, sawyobi, saofise, yvela bazashi da lidting idebi ....bolosken
+//forgot password gaakete, modis email da gaagzavne kodi, tu kodi sworia shevcvalot paroli
+//listingis edit da washla ----es gaakete//
+
+//draftebis cxrili arasruli listingebis shenaxva, get drafts by user , update,delete
+//saved items userma unda sheinaxos listingebi userid - listing cxrili------meore
+//save as drafts listings moxseni requiredebi...........bolosken
+
+//admin panel
+//useris rest api...
+//listing rest api
