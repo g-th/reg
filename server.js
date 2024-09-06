@@ -61,16 +61,17 @@ app.put("/listing", async (req, res) => {
 app.delete("/listing/:id", async (req, res) => {
   try{
     const id = req.params.id;
-  const ans=await Listing.deleteOne({_id:id})
-  const a=await ListingImage.deleteMany({listingId:id})
-  res.status(200).json(ans,a);
+  await Listing.deleteOne({_id:id})
+  await ListingImage.deleteMany({listingId:id})
+  res.status(200);
 }catch(err) {
   console.log(err);
-  res.status(500).json({ message: err.message });
+  res.status(500);
 }
   
 })
 app.get("/getListings" /*/:page*/, async (req, res) => {
+  //carielze qrashavs gaaswore
   try {
     //const page = parseInt(req.params.page);
     const listings = await Listing.find({}).limit(20);
@@ -174,7 +175,15 @@ app.get("/savedItems/:id", async (req, res) => {
   try {
     const id = req.params.id;
     const savedItems=await SavedItem.find({userId:id})
-    res.status(200).json({savedItems});
+    const list = await Promise.all(
+      savedItems.map(async (savedItem) => {
+        const listing=await  Listing.findById(savedItem.listingId)
+        const images = await ListingImage.find({
+          listingId: savedItem.listingId,
+        });
+        return { listing, images };
+      }));
+    res.status(200).json({list});
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -183,9 +192,9 @@ app.delete("/savedItem", async (req, res) => {
   try {
     const{userId,listingId}=req.body;
     const item=await SavedItem.delete({userId:userId,listingId:listingId})
-    res.status(200).json({ item});
+    res.status(200);
   } catch (err) {  
-    res.status(500).json({ error: err.message });
+    res.status(500);
   }
 })
 app.post(
