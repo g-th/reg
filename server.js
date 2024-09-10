@@ -15,6 +15,7 @@ const fileSizeLimiter = require("./middleware/filesSizeLimiter");
 const fileExtLimiter = require("./middleware/filesExtLimiter");
 const auth = require("./middleware/auth");
 const mongoose = require("mongoose");
+
 require("dotenv/config");
 mongoose.connect(process.env.DB_CONNECTION);
 const db = mongoose.connection;
@@ -53,7 +54,7 @@ app.put("/listing", async (req, res) => {
   });
   res.status(200).json(updatedListing);
 }catch(err) {
-  console.log(err);
+  
   res.status(500).json({ message: err.message });
 }
   
@@ -61,12 +62,14 @@ app.put("/listing", async (req, res) => {
 app.delete("/listing/:id", async (req, res) => {
   try{
     const id = req.params.id;
-  await Listing.deleteOne({_id:id})
-  await ListingImage.deleteMany({listingId:id})
-  res.status(200);
+    console.log(id)
+  const ans1=await Listing.deleteOne({_id:id})
+  const ans2=await ListingImage.deleteMany({listingId:id})
+  
+  res.status(200).json({ans1,ans2})
 }catch(err) {
-  console.log(err);
-  res.status(500);
+  
+  res.status(500).json({err});
 }
   
 })
@@ -195,10 +198,12 @@ app.get("/savedItems/:id", async (req, res) => {
 app.delete("/savedItem", async (req, res) => {
   try {
     const{userId,listingId}=req.body;
-    const item=await SavedItem.delete({userId:userId,listingId:listingId})
-    res.status(200);
-  } catch (err) {  
-    res.status(500);
+    console.log(userId,listingId)
+    const ans=await SavedItem.deleteOne({userId:userId,listingId:listingId})
+    res.status(200).json({ans})
+  } catch (err) { 
+    
+    res.status(500).json({err})
   }
 })
 app.post(
