@@ -181,7 +181,11 @@ app.get("/savedItems/:id", async (req, res) => {
         const images = await ListingImage.find({
           listingId: savedItem.listingId,
         });
-        return { listing, images };
+        let imageIds=[]
+        images.forEach((e)=>{
+          imageIds.push(e.id)
+        })
+        return { listing, imageIds };
       }));
     res.status(200).json({list});
   } catch (err) {
