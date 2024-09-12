@@ -4,6 +4,8 @@ const User = require("./models/User");
 const Listing = require("./models/Listing");
 const ListingImage = require("./models/ListingImage");
 const SavedItem=require("./models/SavedItem");
+const Draft=require("./models/Draft");
+const DraftImage=require("./models/DraftImage")
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const cors = require("cors");
@@ -205,6 +207,121 @@ app.delete("/savedItem", async (req, res) => {
     
     res.status(500).json({err})
   }
+})
+
+
+app.get("/draft/:id", async (req, res) => {
+  try{
+ const id=req.params.id
+ const draft=await Draft.find({_id:id})
+ res.status(200).json({draft})
+  }catch(err){
+res.status(500).json({massage:err.massage})
+  }
+})
+app.post("/noImageDraft", async (req, res) => {
+  try{
+  const draft=req.body.draft
+  console.log(draft)
+  const dr=new Draft(draft)
+  const nDr=await dr.save()
+  res.status(200).json(nDr)
+  }catch(err){
+    res.status(500).json({massage:err.massage})
+  }
+})
+app.post("/draft", async (req, res) => {
+  fileUpload({ createParentPath: true }),
+  filesPayloadExists,
+  fileExtLimiter([".png", ".jpg", ".jpeg"]),
+  fileSizeLimiter,
+  async (req, res) => {
+    const files = req.files;
+    
+
+    const { userId, sity,region,address, coordinates, area, type, price, kode,description ,electrisity,water,naturalGas,floor,bathroom,internet,curentCondition} = req.body;
+    console.log(userId)
+    const draft = new Draft({
+      userId: userId,
+      address: address,
+      area: area,
+      type: type,
+      price: price,
+      kode: kode,
+      sity: sity,
+      region: region,
+      coordinates:coordinates,
+      description:description,
+      electrisity:electrisity,
+      water:water,
+      naturalGas:naturalGas,
+      floor:floor,
+      bathroom:bathroom,
+      internet:internet,
+      curentCondition:curentCondition
+      
+
+
+    });
+    let draftId = "";
+    try {
+      const newDraft = await draft.save();
+      console.log(newDraft);
+      draftId = newDraft._id;
+      console.log(draftId);
+    } catch (err) {
+      res.status(400).json({ message: err.message });
+    }
+    if(files!==null){
+    Object.keys(files).forEach(async (key) => {
+      const filepath = path.join(__dirname, "draftFiles", files[key].name);
+      try {
+        const draftImage = new DraftImage({
+          draftId: draftId,
+          path: filepath,
+        });
+        const savedImage = await draftImage.save();
+        console.log(savedImage);
+      } catch (err) {
+        res.status(400).json({ message: err.message });
+      }
+      files[key].mv(filepath, (err) => {
+        if (err) return res.status(500).json({ status: "error", message: err });
+      });
+    });
+    }
+  
+    return res.json({
+      status: "success",
+      message: Object.keys(files).toString() + draftId,
+    });
+  }
+})
+app.put("/draft", async (req, res) => {
+  try{
+    const draft = req.body.draft;
+    const updatedDraft=await Draft.findOneAndUpdate({_id : draft._id}, draft,  {
+      new: true
+    });
+    res.status(200).json(updatedDraft);
+  }catch(err) {
+    
+    res.status(500).json({ message: err.message });
+  }
+})
+app.delete("/draft/:id", async (req, res) => {
+  try{
+    const id = req.params.id;
+    console.log(id)
+  const ans1=await Draft.deleteOne({_id:id})
+  const ans2=await DraftImage.deleteMany({draftId:id})
+  
+  res.status(200).json({ans1,ans2})
+}catch(err) {
+  
+  res.status(500).json({err});
+}
+  
 })
 app.post(
   "/upload",
