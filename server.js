@@ -37,6 +37,8 @@ app.get("/image/:id", async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 });
+//rest images
+
 app.get("/getListing/:id", async (req, res) => {
   const id = req.params.id;
   try {
@@ -61,6 +63,7 @@ app.put("/listing", async (req, res) => {
 }
   
 })
+// sura
 app.delete("/listing/:id", async (req, res) => {
   try{
     const id = req.params.id;
@@ -162,7 +165,7 @@ app.get("/views/:id", async (req, res) => {
   }
 });
 
-
+//sheamowme tu arsebobs agar sheinaxo
 app.post("/savedItem", async (req, res) => {
   try {
     const{userId,listingId}=req.body;
@@ -170,7 +173,13 @@ app.post("/savedItem", async (req, res) => {
       userId,
       listingId
     })
-    const item=await savedItem.save();
+    const i=await SavedItem.find({userId:userId,listingId:listingId})
+    console.log(i.length)
+    const item={}
+    if(i.length=0){
+      item=await savedItem.save();
+    }
+    
     res.status(200).json({ item });
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -209,7 +218,30 @@ app.delete("/savedItem", async (req, res) => {
   }
 })
 
+//userit yvela drafti wamoige
+app.get("/draftByUser/:id", async (req, res) => {
+const id = req.params.id;
+try {
+  const drafts = await Draft.find({userId:id});
+  const list = await Promise.all(
+    drafts.map(async (draft) => {
+      const images = await DraftImage.find({
+        draftId: draft._id.toString(),
+      });
+      let imageIds=[]
+      images.forEach((e)=>{
+        imageIds.push(e.id)
+      })
+      return { draft, imageIds};
+    })
+  );
+  console.log(list);
+  res.status(200).json(list);
+} catch (err) {
+  res.status(500).json({ message: err.message });
+}
 
+})
 app.get("/draft/:id", async (req, res) => {
   try{
  const id=req.params.id
@@ -444,3 +476,4 @@ app.listen(3000, () => {
 //admin panel
 //useris rest api...
 //listing rest api
+//livo gedan aiGe qalaqebi da regionebi

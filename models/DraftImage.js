@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 const DraftImageSchema = new mongoose.Schema({
-  DraftId: {
+  draftId: {
     type: String,
     required: true,
   },
